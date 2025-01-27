@@ -70,6 +70,20 @@ router.post("/admins" ,async (req,res) =>{
   
 })
 
+
+router.get("/auth", async (req, res) => {
+  try {
+    const alladmin = await AdminModel.find(); // Fetch all users from the database
+    res.status(200).json({
+      message: "All Users Data",
+      users: alladmin
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.post("/departmentStaff", async (req, res) => {
   const { tokenNo } = req.body;
 
