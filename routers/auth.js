@@ -1,7 +1,7 @@
 import express from "express";
-import userClear from "../models/OnlineUsers.js";
 import UserModel from "../models/Users.js";
 import AdminModel from "../models/AdminModal.js";
+import userClear from "../models/OnlineUsers.js";
 
 const router = express.Router();
 
@@ -153,7 +153,7 @@ router.get("/register", async (req, res) => {
 
 router.get("/onlineUsers", async (req, res) => {
   try {
-    const onlineUsers = await OnlineUserModal.find(); // Fetch all users from the database
+    const onlineUsers = await userClear.find(); // Fetch all users from the database
     res.status(200).json({
       message: "All Online Users Data",
       onlineUsers: onlineUsers
