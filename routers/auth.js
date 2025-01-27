@@ -71,7 +71,7 @@ router.post("/admins" ,async (req,res) =>{
 })
 
 
-router.get("/auth", async (req, res) => {
+router.get("/admins", async (req, res) => {
   try {
     const alladmin = await AdminModel.find(); // Fetch all users from the database
     res.status(200).json({
