@@ -1,6 +1,7 @@
 import express from "express";
 import userClear from "../models/OnlineUsers.js";
 import UserModel from "../models/Users.js";
+import AdminModel from "../models/AdminModal.js";
 
 const router = express.Router();
 
@@ -21,6 +22,53 @@ router.post("/register", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
+router.post("/admins" ,async (req,res) =>{
+
+  const {email, password} = req.body
+  if (!email || !password ) {
+    return res.status(400).json({
+      success: false,
+      message: "All fields (userId, remarks, updateStatus) are required.",
+    });
+  }
+
+  try {
+    // Ensure you await the result of the database query
+    const admin = await AdminModel.findOne({ email });
+  
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: "Admin not found.",
+      });
+    }
+  
+    // Check if the provided password matches the one stored in the database
+    if (admin.password !== password) {
+      return res.status(400).json({
+        success: false,
+        message: "Incorrect password.",
+      });
+    }
+  
+    // If the email and password match
+    return res.status(200).json({
+      success: true,
+      message: "Admin login successful.",
+      data: admin,
+    });
+  } catch (error) {
+    console.error(error); // Log the error to the server console for debugging
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again later.",
+      data: null,
+    });
+  }
+  
+})
 
 router.post("/departmentStaff", async (req, res) => {
   const { tokenNo } = req.body;
