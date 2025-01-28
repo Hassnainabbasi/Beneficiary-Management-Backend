@@ -23,6 +23,41 @@ router.post("/register", async (req, res) => {
   }
 });
 
+router.put("/register/:id", async (req, res) => {
+  const { id } = req.params; // Make sure this matches the URL path
+  const { name, cnic, phone, address, purpose, tokenNo } = req.body;
+
+  try {
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      id,
+      { name, cnic, phone, address, purpose, tokenNo },
+      { new: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.delete("/register/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedUser = await UserModel.findByIdAndDelete(id);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User deleted successfully", user: deletedUser });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 router.post("/admins" ,async (req,res) =>{
 
