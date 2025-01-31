@@ -2,6 +2,9 @@ import express from "express";
 import UserModel from "../models/Users.js";
 import AdminModel from "../models/AdminModal.js";
 import userClear from "../models/OnlineUsers.js";
+import AnnouncementModel from "../models/Announcment.js";
+import CommentModel from "../models/Comments.js";
+import ReportsModel from "../models/Report.js";
 
 const router = express.Router();
 
@@ -19,6 +22,19 @@ router.post("/register", async (req, res) => {
     res.status(201).json({ message: "User registered successfully", user: newUser });
   } catch (error) {
     console.error("Error registering user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+  
+router.get("/register", async (req, res) => {
+  try {
+    const allUsers = await UserModel.find(); // Fetch all users from the database
+    res.status(200).json({
+      message: "All Users Data",
+      users: allUsers,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -57,7 +73,6 @@ router.delete("/register/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 router.post("/admins" ,async (req,res) =>{
 
@@ -104,7 +119,6 @@ router.post("/admins" ,async (req,res) =>{
   }
   
 })
-
 
 router.get("/admins", async (req, res) => {
   try {
@@ -172,15 +186,110 @@ router.post("/userClear", async (req, res) => {
   }
 });
 
-router.get("/register", async (req, res) => {
+router.post("/announcment", async (req, res) => {
+  const { title, summary, reason, } = req.body;
   try {
-    const allUsers = await UserModel.find(); // Fetch all users from the database
-    res.status(200).json({
-      message: "All Users Data",
-      users: allUsers
+    if ((!title, !summary, !reason)) {
+      return res.status(400).json({ message: "All Fields are required" });
+    }
+   const newAnnouncement = new AnnouncementModel({
+    title, summary, reason
     });
+    await newAnnouncement.save();
+
+    res.status(201).json({ message: "Announcement S successfully", data: newAnnouncement });
+  }
+  catch (error) {
+    console.error("Error registering user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+   
+});
+
+router.get("/announcment", async (req, res) => {
+  try {
+    const announcements = await AnnouncementModel.find();
+
+    if (!announcements || announcements.length === 0) {
+      return res.status(404).json({ message: "No announcements found" });
+    }
+
+    res
+      .status(200)
+      .json({
+        message: "Announcements fetched successfully",
+        data: announcements,
+      });
   } catch (error) {
-    console.error("Error fetching users:", error);
+    console.error("Error fetching announcements:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/comments", async (req, res) => {
+  const { userId, username, content } = req.body;
+  try {
+    const newComment = new CommentModel({
+     userId,
+     content,
+     username
+    });
+    await newComment.save();
+
+    res.status(201).json({ message: "Comment registered successfully", data: newComment });
+  } catch (error) {
+    console.error("Error registering Comment:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/comments", async (req, res) => {
+  try {
+    const comments = await CommentModel.find();
+
+    if (!comments || comments.length === 0) {
+      return res.status(404).json({ message: "No comments found" });
+    }
+
+    res.status(200).json({ message: "Comments fetched successfully", data: comments });
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/report", async (req, res) => {
+  const { formname, description, detailmsg } = req.body;
+  try {
+    const newReport = new ReportsModel({
+     formname,
+     description,
+     detailmsg
+    });
+    await newReport.save();
+
+    res
+      .status(201)
+      .json({ message: "User registered successfully", data: newReport });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/report", async (req, res) => {
+  try {
+    const reports = await ReportsModel.find();
+
+    if (!reports || reports.length === 0) {
+      return res.status(404).json({ message: "No reports found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Reports fetched successfully", data: reports });
+  } catch (error) {
+    console.error("Error fetching reports:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -199,14 +308,6 @@ router.get("/onlineUsers", async (req, res) => {
   }
 })
 
-router.delete("/login", async (req, res) => {
-  const { user } = req.query
-
-  const offlineUser = await OnlineUserModal.deleteOne({ userId: user[0].user._id });
-  console.log("deleteUser=>", user[0].user._id)
-
-  res.status(201).json({ message: "Signout successfully" });
-})
 
 
 
